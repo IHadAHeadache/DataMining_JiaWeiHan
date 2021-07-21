@@ -1,0 +1,26 @@
+flowers = readmatrix('./iris.csv');
+flowers(:,5) = [];
+flowers = sort(flowers);
+max_interval = 6;
+for i = 1:4
+    values = [flowers(:,i) zeros(size(flowers,1),1)];
+    class = 0;
+    for j = 2:size(values,1)
+        if(values(j,1) ~= values(j-1,1))
+            class = class + 1;
+        end
+        values(j,2) = class;
+    end
+    while(values(size(values,1),2) > 5)
+        smallest_stat = 9999999;
+        for k = 1:values(size(values,1),2)-1
+            [h,p,stats] = chi2gof([values(values(:,2)==k);values(values(:,2)==k+1)]);
+            if(smallest_stat>stats.chi2stat)
+                smallest_stat = stats.chi2stat;
+                smallest_k = k;
+            end
+        end
+        values(values(:,2)>smallest_k,2) = values(values(:,2)>smallest_k,2) - 1; 
+    end
+    flowers(:,i+4) = values(:,2)
+end
