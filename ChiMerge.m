@@ -1,8 +1,8 @@
 flowers = readmatrix('./iris.csv');
-flowers = sort(flowers);
 max_interval = 6;
 for i = 1:4
     values = [flowers(:,i) zeros(size(flowers,1),1) flowers(:,5)];
+    values = sortrows(values,1);
     class = 0;
     for j = 2:size(values,1)
         if(values(j,1) ~= values(j-1,1))
@@ -12,7 +12,8 @@ for i = 1:4
     end
     while(values(size(values,1),2) >= max_interval)
         smallest_stat = 9999999;
-        for k = 0:values(size(values,1),2)-1
+        k_end = values(size(values,1),2)-1;
+        for k = 0:k_end
             A = zeros(2,3);
             for ii = 1:2
                 for jj = 1:3
@@ -28,7 +29,9 @@ for i = 1:4
             chi_square = 0;
             for ii = 1:2
                 for jj = 1:3
-                    chi_square = chi_square + (A(ii,jj)-A(ii,4)*A(3,jj)/(A(3,4)+0.0001))^2/(A(ii,4)*A(3,jj)/(A(3,4)+0.0001)+0.0001);
+                    if(A(ii,4)*A(3,jj)/A(3,4) ~= 0)
+                        chi_square = chi_square + (A(ii,jj)-A(ii,4)*A(3,jj)/A(3,4))^2/(A(ii,4)*A(3,jj)/A(3,4));
+                    end
                 end
             end
             if(smallest_stat>chi_square)
@@ -38,5 +41,6 @@ for i = 1:4
         end
         values(values(:,2)>smallest_k,2) = values(values(:,2)>smallest_k,2) - 1; 
     end
+    flowers(:,i) = values(:,1);
     flowers(:,i+5) = values(:,2);
 end
